@@ -1,3 +1,7 @@
+%   Original author: En Yi
+%   The card container class used in the solitaire game
+%   Not optimised though
+%   Anyone can modify it, just need to give credits to the original author
 classdef cardHolder < handle
     %% Deck Properties
     properties (SetAccess = private)

@@ -1,4 +1,9 @@
 function sulitear()
+%   Original author: En Yi
+%   A solitaire game on MATLAB, very self-explanatory
+%   Not optimised though
+%   Have fun!
+%   Anyone can modify it, just need to give credits to the original author
 clc;
 % Construct the window with the axes
 scrsz = get(0,'ScreenSize');

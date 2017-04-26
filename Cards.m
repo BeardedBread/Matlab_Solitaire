@@ -1,3 +1,7 @@
+%   Original author: En Yi
+%   The card class used in the solitaire game
+%   Not optimised though
+%   Anyone can modify it, just need to give credits to the original author
 classdef Cards
     properties(SetAccess = private)
         value

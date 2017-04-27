@@ -24,6 +24,7 @@ win = figure('ToolBar','none','Name','Solitaire',...
 
 % Prepare a variable to indicate which deck are selected
 previous_selected_deck = 0;
+win_game = 0;
 % Prepare cards and the playing field
 playing_cards = prepare_playing_cards();
 [playing_decks,draw_deck,discard_deck,goal_decks,playfield_size] = prepare_playfield(playing_cards,win_ratio);
@@ -32,8 +33,19 @@ disp_axes = axes('Parent',win,'Position',[0 0 1 1]);
 set(disp_axes,'Xlim',[0 playfield_size(1)],'Ylim',[0 playfield_size(2)],...
     'XLimMode','manual','YLimMode','manual','Visible','off','NextPlot','add');
 
+% Prepare winning text
+
 % Draw the playing field  on the axes
 draw_playfield();
+
+% Prepare the text and hide it
+win_text = text(disp_axes,playfield_size(1)/2,playfield_size(2)/4,'You Won! Press R to Try Again!',...
+                        'PickableParts','none','Color',[1 1 1],'FontSize',15,'Visible','off',...
+                        'HorizontalAlignment','center');
+load_text = text(disp_axes,playfield_size(1),playfield_size(2)/8,'Loading...',...
+                        'PickableParts','none','Color',[1 1 1],'FontSize',15,'Visible','off',...
+                        'HorizontalAlignment','right');
+                    
 set(win,'Visible','on')
 
 %% Callback functions
@@ -154,8 +166,10 @@ set(win,'Visible','on')
                 for j = 1:length(goal_decks)
                     total_goal_cards = total_goal_cards+goal_decks(j).get_Number_Of_Cards();
                 end
-                if total_goal_cards == 52
-                    uiwait(msgbox('You Won! Press R to Try Again!','YAY!','modal'));
+                if total_goal_cards == 52 && win_game == 0
+                    win_game = 1;
+                    set(win_text,'Visible','on');
+                    
                     reset_card_selection();
                 end
                 
@@ -169,10 +183,12 @@ set(win,'Visible','on')
 %% Non-Callback functions
 % Prepare the card holders
     function restart(~,evtdata)
+        set(load_text,'Visible','on');drawnow;
         % Press R to try again
         if strcmp(evtdata.Key,'r')
             reset_entire_game(playing_cards);
         end
+        set(load_text,'Visible','off');
     end
 % Prepare the playing field dimension with the card holders
     function [playing_decks,draw_deck,discard_deck,goal_decks,playfield_size] = prepare_playfield(cards,win_ratio)
@@ -211,8 +227,7 @@ set(win,'Visible','on')
                 playfield_size(2)-border_offset,[],card_width,card_height,card_offset,'vertical',1,0,0,1);
         end
         % Shuffle the cards
-        a = randperm(length(cards));
-        remaining_cards = cards(a);
+        remaining_cards = cards(randperm(length(cards)));
         
         for i = 1:n
             dealt_cards = remaining_cards(1:i);
@@ -255,12 +270,14 @@ set(win,'Visible','on')
 
 % Reset the game
     function reset_entire_game(cards)
-        a = randperm(length(cards));
-        remaining_cards = cards(a);
+        if win_game
+            win_game=0;
+            set(win_text,'Visible','off');
+        end
+        remaining_cards = cards(randperm(length(cards)));
         for i = 1:length(playing_decks)
             playing_decks(i).clear_Deck();
-            dealt_cards= remaining_cards(1:i);
-            playing_decks(i).append_Cards(dealt_cards);
+            playing_decks(i).append_Cards(remaining_cards(1:i));
             playing_decks(i).hidden_start_index = i-1;
             playing_decks(i).update_Deck_Graphics(disp_axes);
             remaining_cards = remaining_cards(i+1:end);

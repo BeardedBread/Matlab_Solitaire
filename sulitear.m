@@ -99,33 +99,37 @@ set(win,'Visible','on')
             if playing_decks(i).check_Deck_Collision(Xx,Yy,'full')
                 selected_deck = playing_decks(i);
                 s_index = selected_deck.check_selection(Xx,Yy);             %Check which card is selected
-                
-                % Manually open a hidden card, not used
-                %                 if playing_decks(i).check_Deck_Collision(Xx,Yy,'first') && s_index == -1
-                %                     reset_card_selection();
-                %                     selected_deck.reveal_Hidden_Card(1)
-                %                     selected_deck.update_Deck_Graphics(disp_axes);
-                %                     return
-                %                 end
-                
-                % If a deck is previously selected
-                if (previous_selected_deck ~= 0)
-                    if previous_selected_deck ~= selected_deck
-                        [transferring_num,transferring_col]= determine_card(get_bottom_selected(previous_selected_deck));
-                        [destination_num,destination_col] = determine_card(selected_deck.get_Last_Cards());
-                        if (transferring_col ~= destination_col &&...                       % If the colour alternates
-                                transferring_num == destination_num-1)                      % If the number are in sequence
-                            transfer_Selected_Cards(previous_selected_deck,selected_deck);
+                if s_index>=0
+                    
+                    % Manually open a hidden card, not used
+                    %                 if playing_decks(i).check_Deck_Collision(Xx,Yy,'first') && s_index == -1
+                    %                     reset_card_selection();
+                    %                     selected_deck.reveal_Hidden_Card(1)
+                    %                     selected_deck.update_Deck_Graphics(disp_axes);
+                    %                     return
+                    %                 end
+                    
+                    % If a deck is previously selected
+                    if (previous_selected_deck ~= 0)
+                        if previous_selected_deck ~= selected_deck
+                            [transferring_num,transferring_col]= determine_card(get_bottom_selected(previous_selected_deck));
+                            [destination_num,destination_col] = determine_card(selected_deck.get_Last_Cards());
+                            if (transferring_col ~= destination_col &&...                       % If the colour alternates
+                                    transferring_num == destination_num-1)                      % If the number are in sequence
+                                transfer_Selected_Cards(previous_selected_deck,selected_deck);
+                            end
+                            auto_open_hiddencard();                                             % Reveal a hidden card if there is one
                         end
-                        auto_open_hiddencard();                                             % Reveal a hidden card if there is one
-                    end
-                    reset_card_selection();
-                else
-                    if ~selected_deck.is_Empty()
                         reset_card_selection();
-                        selected_deck.selected_start_index = s_index;
-                        previous_selected_deck = selected_deck;
+                    else
+                        if ~selected_deck.is_Empty()
+                            reset_card_selection();
+                            selected_deck.selected_start_index = s_index;
+                            previous_selected_deck = selected_deck;
+                        end
                     end
+                else
+                    reset_card_selection();
                 end
                 selected_deck.update_Deck_Graphics(disp_axes);
                 return
